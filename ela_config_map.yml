@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elastic-configmap
+data:
+  elasticsearch.yml: |
+    cluster:
+      name: elasticsearch_cluster
+
+    node:
+      master: ${NODE_MASTER} #true/false
+      name: ${NODE_NAME}
+      data: ${NODE_DATA} #true/false
+      ingest: ${NODE_INGEST}
+      ml: ${NODE_ML}
+      max_local_storage_nodes: ${MAX_LOCAL_STORAGE_NODES}
+
+    network.host: ${NETWORK_HOST}
+
+    path:
+      data: /data/data
+      logs: /data/log
+      repo: ${REPO_LOCATIONS}
+
+    bootstrap:
+      memory_lock: ${MEMORY_LOCK}
+
+    http:
+      #enabled: ${HTTP_ENABLE}
+      compression: true
+      cors:
+        enabled: ${HTTP_CORS_ENABLE}
+        allow-origin: ${HTTP_CORS_ALLOW_ORIGIN}
+
+    discovery:
+      zen:
+        ping.unicast.hosts: ${DISCOVERY_SERVICE}
+        minimum_master_nodes: ${NUMBER_OF_MASTERS}
+
+    # xpack:
+    #   license:
+    #     self_generated:
+    #       type: ${LICENSE}
+    #   security:
+    #     enabled: ${XPACK_SECURITY_ENABLED}
+
+  jvm.options: |
+    -Xms512m
+    -Xmx512m
+    -XX:+DisableExplicitGC
+    -XX:+AlwaysPreTouch
+    -server
+    -Xss1m
+    -Djava.awt.headless=true
+    -Dfile.encoding=UTF-8
+    -Djna.nosys=true
+    -Djdk.io.permissionsUseCanonicalPath=true
+    -Dio.netty.noUnsafe=true
+    -Dio.netty.noKeySetOptimization=true
+    -Dlog4j.shutdownHookEnabled=false
+    -Dlog4j2.disable.jmx=true
+    -Dlog4j.skipJansi=true
+    -XX:+HeapDumpOnOutOfMemoryError
+    -XX:+UseParallelGC
+    -Des.enforce.bootstrap.checks=true
+  log4j2.properties: |
+    status = error
+    appender.console.type = Console
+    appender.console.name = console
+    appender.console.layout.type = PatternLayout
+    appender.console.layout.pattern = [%d{ISO8601}][%-5p][%-25c{1.}] %marker%m%n
+    rootLogger.level = DEBUG
+    rootLogger.appenderRef.console.ref = console
+
+
+    ##logger.deprecation.level = error   
+    # log4j.rootLogger=DEBUG, CONSOLE, FILE
+    # log4j.appender.console.type = Console
+    # log4j.appender.console.layout.type = PatternLayout
+    # log4j.appender.console.layout.pattern = [%d{ISO8601}][%-5p][%-25c{1.}] [%node_name]%marker%m%n
+    # log4j.appender.FILE=org.apache.log4j.FileAppender
+    # log4j.appender.FILE.file="elasticsearch_cluster2.log"
+    # log4j.appender.FILE.append=false
+    # log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
+    # log4k.appender.FILE.layout.pattern=%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
+    #appender.FILE.layout.pattern=[%d{ISO8601}][%-5p][%-25c{1.}] [%node_name]%marker%m%n
